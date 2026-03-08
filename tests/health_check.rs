@@ -10,6 +10,6 @@ fn wallet_creation_works_for_xrpl() {
     let wallet = Wallet::new(address, initial_balance, Currency::XRP);
 
     // Verification
-    assert_eq!(wallet.balance, 100_000_000);
-    assert_eq!(wallet.address, address);
+    assert_eq!(wallet.balance(), 100_000_000);
+    assert_eq!(wallet.address(), address);
 }
