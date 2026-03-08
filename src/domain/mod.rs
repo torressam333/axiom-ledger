@@ -11,12 +11,16 @@ pub struct Wallet {
 }
 
 impl Wallet {
-    pub fn new(address: &str, balance: u128, currency: Currency) -> Self {
-        Self {
+    pub fn new(address: &str, balance: u128, currency: Currency) -> Result<Self, String> {
+        if !address.starts_with("r") {
+            return Err(format!("{} is not a valid XRPL address", address));
+        }
+
+        Ok(Self {
             address: address.to_string(),
             balance,
             currency,
-        }
+        })
     }
 
     pub fn balance(&self) -> u128 {
