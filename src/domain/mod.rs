@@ -44,9 +44,8 @@ pub struct Wallet {
 }
 
 impl Wallet {
-    pub fn new(addr_str: &str, balance: u128, currency: Currency) -> Result<Self, String> {
+    pub fn new(addr_str: &str, balance: Balance, currency: Currency) -> Result<Self, String> {
         let address = Address::parse(addr_str.to_string())?;
-        let balance = Balance::new(balance);
 
         Ok(Self {
             address,
