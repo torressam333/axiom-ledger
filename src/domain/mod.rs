@@ -62,4 +62,8 @@ impl Wallet {
     pub fn address(&self) -> &str {
         &self.address.as_str()
     }
+
+    pub fn deposit(&mut self, amount: Balance) {
+        self.balance = Balance::new(self.balance.value() + amount.value())
+    }
 }
