@@ -60,7 +60,7 @@ impl Wallet {
     }
 
     pub fn address(&self) -> &str {
-        &self.address.as_str()
+        self.address.as_str()
     }
 
     pub fn deposit(&mut self, amount: Balance) {
