@@ -65,4 +65,18 @@ impl Wallet {
     pub fn deposit(&mut self, amount: Balance) {
         self.balance = Balance::new(self.balance.value() + amount.value())
     }
+
+    pub fn withdraw(&mut self, withdraw_amount: Balance) -> Result<(), String> {
+        let actual_balance = self.balance.value();
+        let withdraw_value = withdraw_amount.value();
+
+        // Check if the with withdraw amt will leave user in negative state, if so deny it asap
+        if actual_balance < withdraw_value {
+            return Err(String::from("Insufficient funds"));
+        }
+
+        self.balance = Balance::new(self.balance.value() - withdraw_amount.value());
+
+        Ok(())
+    }
 }
