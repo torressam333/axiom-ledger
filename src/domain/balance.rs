@@ -27,7 +27,7 @@ impl Balance {
                 Ok(Self::new(xrp * 1_000_000))
             }
             2 => {
-                // Has a decimal like 1.5
+                // Has a decimal like 1.5 to begin with
                 let xrp: u128 = parts[0].parse().map_err(|_| "Invalid XRP part")?;
                 let mut fraction_string = parts[1].to_string();
 
@@ -35,7 +35,7 @@ impl Balance {
                     return Err("XRP precision cannot exceed 6 decimal places (1 drop)".into());
                 }
 
-                // Pad the string i.e. ".5" becomes "500000" // Pad the string i.e. ".5" becomes "500000"
+                // Pad the string so that ".5" becomes "500000"
                 while fraction_string.len() < 6 {
                     fraction_string.push('0');
                 }
