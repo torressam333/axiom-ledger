@@ -80,7 +80,7 @@ fn test_balance_from_xrp_conversion() {
 
 #[test]
 fn test_balance_from_xrp_invalid_formats() {
-    let test_cases = vec!["1.2.3", "abc", "1.0000005"];
+    let test_cases = vec!["1.2.3", "abc", "1.0000005", " 100abcw.    "];
 
     for input in test_cases {
         assert!(Balance::from_xrp(input).is_err());

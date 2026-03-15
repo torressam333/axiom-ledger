@@ -15,6 +15,8 @@ impl Balance {
     // Take a string and convert to xrp drops equivalent
     // ...into exact balance in drops (Whole and fractional XRP)
     pub fn from_xrp(amount: &str) -> Result<Self, String> {
+        // Account for user copy-pasta amounts with whitespace
+        let amount = amount.trim();
         let parts: Vec<&str> = amount.split(".").collect();
 
         match parts.len() {
