@@ -13,6 +13,7 @@ impl Balance {
     }
 
     // Take a string and convert to xrp drops equivalent
+    // ...into exact balance in drops (Whole and fractional XRP)
     pub fn from_xrp(amount: &str) -> Result<Self, String> {
         let parts: Vec<&str> = amount.split(".").collect();
 
@@ -39,7 +40,7 @@ impl Balance {
 
                 let drops: u128 = fraction_string.parse().map_err(|_| "Invalid drop part")?;
 
-                Ok(Self::new((xrp + 1_000_000) + drops))
+                Ok(Self::new((xrp * 1_000_000) + drops))
             }
             _ => Err("Invalid format. Use '1.5' or '100'".into()),
         }

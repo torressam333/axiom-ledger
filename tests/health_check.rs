@@ -56,3 +56,24 @@ fn withdrawing_from_balance_with_insufficient_funds_errors() {
     // Balance shouldn't have changed
     assert_eq!(wallet.balance(), intial_balance.value())
 }
+
+#[test]
+fn test_balance_from_xrp_conversion() {
+    let test_cases = vec![
+        ("1", 1_000_000, "Whole numbers"),
+        ("1.5", 1_500_000, "Decimals"),
+        ("0.000001", 1, "Minimum drop"),
+        ("100.25", 100_250_000, "Large amounts"),
+    ];
+
+    for (input, expected_drops, description) in test_cases {
+        let balance = Balance::from_xrp(input).expect(description);
+
+        assert_eq!(
+            balance.value(),
+            expected_drops,
+            "Failed on {}.",
+            description
+        );
+    }
+}
