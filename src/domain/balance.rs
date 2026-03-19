@@ -1,15 +1,19 @@
-// Balance NewTpy
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Balance(u128);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Drops(pub u128);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Balance(Drops);
 
 impl Balance {
     pub fn new(value: u128) -> Self {
         // u ints cant be negative but might add max limit in future
-        Self(value)
+        Self(Drops(value))
     }
 
     pub fn value(&self) -> u128 {
-        self.0
+        // Okayy so now we access the inner value of the new wrapped type.
+        // Russian nesting dolls style lol
+        (self.0).0
     }
 
     // Take a string and convert to xrp drops equivalent
