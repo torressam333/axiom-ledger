@@ -1,3 +1,33 @@
+use std::fmt;
+use std::ops::Add;
+
+// 1. Format XRP for humans and Drops for computers
+impl fmt::Display for Balance {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let total_drops = self.value();
+        let xrp = total_drops / 1_000_000;
+        let drops = total_drops % 1_000_000;
+
+        if drops == 0 {
+            write!(f, "{}", xrp)
+        } else {
+            // Ensure leading zeros are mainitained
+            write!(f, "{}.{:06}", xrp, drops)
+        }
+    }
+}
+
+impl Add for Balance {
+    type Output = Result<Self, String>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        self.value()
+            .checked_add(rhs.value())
+            .map(Self::new)
+            .ok_or_else(|| "Balance overflow detected".to_string())
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Drops(pub u128);
 
@@ -50,5 +80,45 @@ impl Balance {
             }
             _ => Err("Invalid format. Use '1.5' or '100'".into()),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::domain::Balance;
+
+    #[test]
+    fn test_balance_display_formatting() {
+        let test_cases = vec![
+            (1_000_000, "1", "Whole XRP"),
+            (1_500_000, "1.500000", "Standard decimal"),
+            (1, "0.000001", "The Minimum Drop case"),
+            (100, "0.000100", "Leading zeros in fraction"),
+        ];
+
+        for (drops, expected, msg) in test_cases {
+            let bal = Balance::new(drops);
+            assert_eq!(format!("{}", bal), expected, "Failed: {}", msg);
+        }
+    }
+
+    #[test]
+    fn test_balance_addition() {
+        let a = Balance::new(1_000_000); // One XRP
+        let b = Balance::new(500_000); // Half an xrp
+
+        let result = (a + b).expect("Addition should succeed");
+
+        assert_eq!(result.value(), 1_500_000);
+    }
+
+    #[test]
+    fn test_balance_addition_overflow() {
+        let a = Balance::new(u128::MAX);
+        let b = Balance::new(1);
+
+        let result = a + b; // Safelt addding bc of newtype :)
+
+        assert!(result.is_err(), "Should have detected overflow");
     }
 }
