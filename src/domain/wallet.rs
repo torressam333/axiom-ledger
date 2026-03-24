@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 pub use crate::domain::address::Address;
 pub use crate::domain::balance::Balance;
 
@@ -15,7 +17,7 @@ pub struct Wallet {
 
 impl Wallet {
     pub fn new(addr_str: &str, balance: Balance, currency: Currency) -> Result<Self, String> {
-        let address = Address::parse(addr_str.to_string())?;
+        let address = Address::from_str(addr_str)?;
 
         Ok(Self {
             address,
