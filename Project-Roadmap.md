@@ -12,7 +12,7 @@
 
 ## Phase 2: Persistence & The Repository Pattern
 *The Goal: Durable, ACID-compliant storage decoupled from the business logic.*
-- [ ] **Local-First Infrastructure:** Setup a `docker-compose.yml` for PostgreSQL (Free/Local).
+- [x] **Local-First Infrastructure:** Setup a `docker-compose.yml` for PostgreSQL (Free/Local).
 - [ ] **Schema Design:** Define `wallets` and `ledger_entries` with strict SQL constraints.
 - [ ] **SQLx Integration:** Setup `sqlx` with compile-time query verification.
 - [ ] **The Repository Trait:** Define a `WalletRepository` trait to allow for easy mocking.
