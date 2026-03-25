@@ -8,7 +8,7 @@
 - [x] **Fixed-Point Conversion:** Manual parsing of XRP strings to "Drops" (Avoid IEEE 754 float errors).
 - [x] **The Newtype Pattern:** Wrap primitive types (e.g., `pub struct DropCount(u128)`) to prevent logic errors.
 - [x] **Trait System:** Implement `Display` (formatting), `Add`/`Sub` (operator overloading), and `FromStr`.
-- [ ] **Validation Layer:** Use the `validator` crate for XRPL-specific address checksums.
+- [x] **Validation Layer:** Use the `validator` crate for XRPL-specific address checksums.
 
 ## Phase 2: Persistence & The Repository Pattern
 *The Goal: Durable, ACID-compliant storage decoupled from the business logic.*
