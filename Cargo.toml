@@ -7,3 +7,21 @@ edition = "2024"
 validator = { version = "0.20.0", features = [
   "derive",
 ] }
+# SQLx with Postgres and Async support
+sqlx = { version = "0.8", features = [
+  "runtime-tokio",
+  "tls-rustls",
+  "postgres",
+  "macros",
+  "chrono",
+  "runtime-tokio-rustls",
+  "bigdecimal",
+] }
+# For handling the NUMERIC database type accurately
+bigdecimal = "0.4"
+# Async runtime
+tokio = { version = "1", features = [
+  "full",
+] }
+# Environment variable loader
+dotenvy = "0.15"
