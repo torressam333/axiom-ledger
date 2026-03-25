@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS wallets (
 );
 
 -- CREATE THE "IMMUTABILITY GUARD"
--- This trigger prevents ANYONE (even a bug in your Rust code) from deleting a row.
+-- This trigger prevents ANYONE (even a bug in the code) from deleting a row.
 CREATE OR REPLACE FUNCTION block_wallet_deletion()
 RETURNS TRIGGER AS $$
 BEGIN
