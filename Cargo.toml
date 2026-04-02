@@ -23,5 +23,6 @@ bigdecimal = "0.4"
 tokio = { version = "1", features = [
   "full",
 ] }
-# Environment variable loader
 dotenvy = "0.15"
+async-trait = "0.1"
+# Environment variable loader
