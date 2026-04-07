@@ -1,5 +1,8 @@
+use core::fmt;
+use std::format;
 use std::str::FromStr;
 use validator::{Validate, ValidationError};
+
 // Address NewType
 #[derive(Debug, PartialEq, Clone, Validate)]
 pub struct Address {
@@ -23,7 +26,15 @@ impl Address {
     }
 }
 
+// Need a way to turn address -> String
+impl fmt::Display for Address {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
 // No custom parse, using idiomatic way to handle str parsing
+// Turns string -> Address
 impl FromStr for Address {
     type Err = String;
 
