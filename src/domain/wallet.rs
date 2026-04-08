@@ -52,3 +52,57 @@ impl Wallet {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_deposit_increases_balance() {
+        // Setup the initial wallet state
+        let mut wallet = Wallet::new(
+            "rPT1Sjq2YGrBMTU2C27uPHqc9S7fPfMqM7",
+            Balance::new(100),
+            Currency::XRP,
+        )
+        .unwrap();
+
+        wallet.deposit(Balance::new(489));
+
+        assert_eq!(wallet.balance(), 589);
+    }
+
+    #[test]
+    fn test_withdraw_decreases_balance() {
+        // Setup the initial wallet state
+        let mut wallet = Wallet::new(
+            "rPT1Sjq2YGrBMTU2C27uPHqc9S7fPfMqM7",
+            Balance::new(100),
+            Currency::XRP,
+        )
+        .unwrap();
+
+        let result = wallet.withdraw(Balance::new(50));
+
+        assert!(result.is_ok());
+        assert_eq!(wallet.balance(), 50);
+    }
+
+    #[test]
+    fn test_withdraw_fails_if_insufficient_funds() {
+        let mut wallet = Wallet::new(
+            "rPT1Sjq2YGrBMTU2C27uPHqc9S7fPfMqM7",
+            Balance::new(100),
+            Currency::XRP,
+        )
+        .unwrap();
+
+        // Attempting to withdraw more than we have
+        let result = wallet.withdraw(Balance::new(150));
+
+        // Assert that it failed and the balance stayed the same
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Insufficient funds");
+        assert_eq!(wallet.balance(), 100);
+    }
+}
