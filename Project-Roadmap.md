@@ -16,7 +16,7 @@
 - [x] **Schema Design:** Define `wallets` and `ledger_entries` with strict SQL constraints.
 - [x] **SQLx Integration:** Setup `sqlx` with compile-time query verification.
 - [x] **The Repository Trait:** Define a `WalletRepository` trait to allow for easy mocking.
-- [ ] **Atomic Transactions:** Implement a "Transfer" function using SQL transactions.
+- [x] **Atomic Transactions:** Implement a "Transfer" function using SQL transactions.
 
 ## Phase 3: The GraphQL Supergraph Layer
 *The Goal: A high-performance, contract-first API using `async-graphql`.*

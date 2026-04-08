@@ -1,4 +1,5 @@
 use crate::domain::Address;
+use crate::domain::Balance;
 use crate::repository::{TransactionProvider, WalletRepository};
 use anyhow::{Result, anyhow};
 
@@ -58,7 +59,7 @@ where
         // 4. NEXT SUB-STEP: Who is the sender?
         // (Since we sorted them, first_wallet might be the receiver!)
         // Map our ordered "first/second" wallets back to "sender/receiver" roles
-        let (sender, receiver) = if first_wallet.address() == from_address.as_str() {
+        let (mut sender, mut receiver) = if first_wallet.address() == from_address.as_str() {
             (first_wallet, second_wallet)
         } else {
             (second_wallet, first_wallet)
@@ -73,6 +74,12 @@ where
                 amount
             ));
         }
+
+        // We must update the in-memory state of the objects before saving.
+        let transfer_balance = Balance::new(amount);
+
+        sender.withdraw(transfer_balance).map_err(|e| anyhow!(e))?;
+        receiver.deposit(transfer_balance);
 
         // 6. PERSISTENCE (Inside the bubble)
         // MUST use the same &mut tx so these updates happen before the lock is released.

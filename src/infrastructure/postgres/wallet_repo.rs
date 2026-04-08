@@ -4,6 +4,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use sqlx::{PgPool, Postgres, Transaction};
 
+#[derive(Clone)]
 pub struct PostgresWalletRepository {
     pool: PgPool,
 }
