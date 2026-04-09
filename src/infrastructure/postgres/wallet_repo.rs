@@ -1,8 +1,10 @@
-use crate::domain::{Address, Balance, Wallet};
+use crate::domain::{Address, Balance, Currency, Wallet};
 use crate::repository::WalletRepository;
+use anyhow::Result;
 use async_trait::async_trait;
-use sqlx::PgPool;
+use sqlx::{PgPool, Postgres, Transaction};
 
+#[derive(Clone)]
 pub struct PostgresWalletRepository {
     pool: PgPool,
 }
@@ -37,16 +39,43 @@ impl WalletRepository for PostgresWalletRepository {
         }))
     }
 
-    async fn save(&self, wallet: &Wallet) -> Result<(), sqlx::Error> {
+    async fn save(
+        &self,
+        tx: &mut Transaction<'_, Postgres>,
+        wallet: &Wallet,
+    ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "INSERT INTO wallets (address, balance) VALUES ($1, $2) 
              ON CONFLICT (address) DO UPDATE SET balance = $2",
             wallet.address(),
             wallet.balance() as i64
         )
-        .execute(&self.pool)
+        .execute(&mut **tx) // Gets us access to raw DB conn. 1. -> (Transaction(DB Conn)) -> 2. Transaction(DB Conn) -> 3. DB Conn
         .await?;
 
         Ok(())
+    }
+
+    async fn find_by_address_for_update(
+        &self,
+        tx: &mut Transaction<'_, Postgres>,
+        address: &Address,
+    ) -> Result<Option<Wallet>, sqlx::Error> {
+        let row = sqlx::query!(
+            r#"
+        SELECT address, balance
+        FROM wallets
+        WHERE address = $1
+        FOR UPDATE
+        "#,
+            address.as_str()
+        )
+        .fetch_optional(&mut **tx)
+        .await?;
+
+        // If we find a row turn into a wallet. Otherwise, do nothing.
+        Ok(row.map(|r| {
+            Wallet::new(&r.address, Balance::new(r.balance as u128), Currency::XRP).unwrap()
+        }))
     }
 }

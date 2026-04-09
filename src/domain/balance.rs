@@ -17,6 +17,15 @@ impl fmt::Display for Balance {
     }
 }
 
+/// Implements the `Add` trait for the `Balance` type, enabling the `+` operator.
+///
+/// # Behavior
+/// When two `Balance` values are added together:
+/// - The underlying numeric values are extracted using `value()`
+/// - `checked_add()` safely adds them, returning `Option` to prevent overflow
+/// - If addition succeeds, a new `Balance` is constructed with `Self::new()`
+/// - If overflow would occur, an error message is returned instead
+/// ```
 impl Add for Balance {
     type Output = Result<Self, String>;
 
@@ -35,11 +44,13 @@ pub struct Drops(pub u128);
 pub struct Balance(Drops);
 
 impl Balance {
+    // Setter
     pub fn new(value: u128) -> Self {
         // u ints cant be negative but might add max limit in future
         Self(Drops(value))
     }
 
+    // Getter of value
     pub fn value(&self) -> u128 {
         // Okayy so now we access the inner value of the new wrapped type.
         // Russian nesting dolls style lol
