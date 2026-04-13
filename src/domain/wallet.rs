@@ -34,22 +34,42 @@ impl Wallet {
         self.address.as_str()
     }
 
-    pub fn deposit(&mut self, amount: Balance) {
-        self.balance = Balance::new(self.balance.value() + amount.value())
-    }
-
-    pub fn withdraw(&mut self, withdraw_amount: Balance) -> Result<(), String> {
-        let actual_balance = self.balance.value();
-        let withdraw_value = withdraw_amount.value();
-
-        // Check if the with withdraw amt will leave user in negative state, if so deny it asap
-        if actual_balance < withdraw_value {
-            return Err(String::from("Insufficient funds"));
+    pub fn deposit(&mut self, amount: Balance, currency: Currency) -> Result<(), String> {
+        if self.currency != currency {
+            return Err(format!(
+                "Currency mismatch: cannot deposit {:?} into an {:?} wallet",
+                currency, self.currency
+            ));
         }
 
-        self.balance = Balance::new(self.balance.value() - withdraw_amount.value());
+        self.balance = Balance::new(self.balance.value() + amount.value());
 
         Ok(())
+    }
+
+    /// Only allows withdrawal if currencies match AND funds are sufficient
+    pub fn withdraw(&mut self, amount: Balance, currency: Currency) -> Result<(), String> {
+        if self.currency != currency {
+            return Err(format!(
+                "Currency mismatch: cannot withdraw {:?} from an {:?} wallet",
+                currency, self.currency
+            ));
+        }
+
+        let current_val = self.balance.value();
+        let withdraw_val = amount.value();
+
+        if current_val < withdraw_val {
+            return Err("Insufficient funds".to_string());
+        }
+
+        self.balance = Balance::new(current_val - withdraw_val);
+        Ok(())
+    }
+
+    // Getter for wallets fixed currency
+    pub fn currency(&self) -> &Currency {
+        &self.currency
     }
 }
 
@@ -67,7 +87,7 @@ mod tests {
         )
         .unwrap();
 
-        wallet.deposit(Balance::new(489));
+        wallet.deposit(Balance::new(489), Currency::XRP);
 
         assert_eq!(wallet.balance(), 589);
     }
@@ -82,7 +102,7 @@ mod tests {
         )
         .unwrap();
 
-        let result = wallet.withdraw(Balance::new(50));
+        let result = wallet.withdraw(Balance::new(50), Currency::XRP);
 
         assert!(result.is_ok());
         assert_eq!(wallet.balance(), 50);
@@ -98,7 +118,7 @@ mod tests {
         .unwrap();
 
         // Attempting to withdraw more than we have
-        let result = wallet.withdraw(Balance::new(150));
+        let result = wallet.withdraw(Balance::new(150), Currency::XRP);
 
         // Assert that it failed and the balance stayed the same
         assert!(result.is_err());
