@@ -36,6 +36,7 @@ where
         let mut tx = self.provider.begin_transaction().await?;
 
         // 2. DETERMINISTIC ORDERING
+        // Guarantees that every thread always requests the locks in EXACT same order
         let (first_addr, second_addr) = if from_address.as_str() < to_address.as_str() {
             (from_address, to_address)
         } else {
@@ -75,11 +76,26 @@ where
             ));
         }
 
+        // Check currency matches
+        let transfer_currency = sender.currency().clone();
+
+        if sender.currency() != receiver.currency() {
+            return Err(anyhow!(
+                "Multi-asset transfer error: Sender is {:?}, but Receiver is {:?}",
+                sender.currency(),
+                receiver.currency()
+            ));
+        }
+
         // We must update the in-memory state of the objects before saving.
         let transfer_balance = Balance::new(amount);
 
-        sender.withdraw(transfer_balance).map_err(|e| anyhow!(e))?;
-        receiver.deposit(transfer_balance);
+        sender
+            .withdraw(transfer_balance, transfer_currency)
+            .map_err(|e| anyhow!(e))?;
+        receiver
+            .deposit(transfer_balance, transfer_currency)
+            .map_err(|e| anyhow!(e))?;
 
         // 6. PERSISTENCE (Inside the bubble)
         // MUST use the same &mut tx so these updates happen before the lock is released.

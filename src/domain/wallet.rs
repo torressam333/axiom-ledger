@@ -3,7 +3,7 @@ use std::str::FromStr;
 pub use crate::domain::address::Address;
 pub use crate::domain::balance::Balance;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Currency {
     XRP,
 }
@@ -87,7 +87,7 @@ mod tests {
         )
         .unwrap();
 
-        wallet.deposit(Balance::new(489), Currency::XRP);
+        wallet.deposit(Balance::new(489), Currency::XRP).unwrap();
 
         assert_eq!(wallet.balance(), 589);
     }
