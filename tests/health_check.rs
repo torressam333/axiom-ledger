@@ -35,7 +35,7 @@ fn wallet_deposit_updates_balance() {
 
     let additional_balance = Balance::new(50);
 
-    wallet.deposit(additional_balance);
+    let _ = wallet.deposit(additional_balance, Currency::XRP);
 
     // Wallet shouold have additional funds after depositing
     assert_eq!(wallet.balance(), 150);
@@ -48,7 +48,7 @@ fn withdrawing_from_balance_with_insufficient_funds_errors() {
     let address = "rPT1Sjq2YGrvB3yS2ne8heJWTVyK3u6mcw";
     let mut wallet = Wallet::new(address, intial_balance, Currency::XRP).unwrap();
 
-    let result = wallet.withdraw(withdraw_amount);
+    let result = wallet.withdraw(withdraw_amount, Currency::XRP);
 
     // Shouold get error
     assert!(result.is_err());

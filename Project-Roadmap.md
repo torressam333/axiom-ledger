@@ -17,6 +17,7 @@
 - [x] **SQLx Integration:** Setup `sqlx` with compile-time query verification.
 - [x] **The Repository Trait:** Define a `WalletRepository` trait to allow for easy mocking.
 - [x] **Atomic Transactions:** Implement a "Transfer" function using SQL transactions.
+- [ ] **Multi-Asset Safety:** Implement currency validation in the Domain and Service layers to prevent illegal cross-asset transfers.
 
 ## Phase 3: The GraphQL Supergraph Layer
 *The Goal: A high-performance, contract-first API using `async-graphql`.*
