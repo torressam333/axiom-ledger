@@ -1,6 +1,8 @@
 use axiom_ledger::domain::Address;
 use axiom_ledger::infrastructure::postgres::PostgresWalletRepository;
+use axiom_ledger::repository::TransactionProvider;
 use axiom_ledger::repository::WalletRepository;
+use axiom_ledger::repository::db_provider::TransactionHandler;
 use axiom_ledger::service::TransferService;
 use dotenvy::dotenv;
 use sqlx::PgPool;
@@ -8,56 +10,46 @@ use std::env;
 
 #[tokio::test]
 async fn test_execute_transfer_success_integration() {
-    dotenv().ok(); // This looks for a .env file and loads it into the process
-
-    //Get conn string from .env then connect to local db (Im using postgres)
-    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env or environment");
+    dotenv().ok();
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = PgPool::connect(&db_url).await.unwrap();
 
-    // Create user addresses FIRST
-    let alice_addr_str = "rAlicePT1Sjq2YGrBMTU2C27uPHqc9S7fP";
-    let bob_addr_str = "rBobPT1Sjq2YGrBMTU2C27uPHqc9S7fPfM";
+    let alice_addr = Address::new("rAlicePT1Sjq2YGrBMTU2C27uPHqc9S7fP".to_string()).unwrap();
+    let bob_addr = Address::new("rBobPT1Sjq2YGrBMTU2C27uPHqc9S7fPfM".to_string()).unwrap();
 
-    // Init the repo and the service
     let repo = PostgresWalletRepository::new(pool.clone());
     let service = TransferService::new(repo.clone(), pool.clone());
 
-    // Prep the data for this tx
-    let alice_addr = Address::new(alice_addr_str.to_string()).unwrap();
-    let bob_addr = Address::new(bob_addr_str.to_string()).unwrap();
-
-    // (Insert Alice with 100 and Bob with 50 into DB
-    // Save their wallets and an XRP balance into the db
+    // 1. Setup - Using &pool here is fine because this is raw SQL setup, not the Repo
     sqlx::query!(
         "INSERT INTO wallets (address, balance, currency) VALUES ($1, $2, $3)
          ON CONFLICT (address) DO UPDATE SET balance = $2, currency = $3",
-        alice_addr.as_str(), // $1
-        100i64,              // $2 (Postgres usually wants i64 for BIGINT)
-        "XRP"                // $3
-    )
-    .execute(&pool)
-    .await
-    .expect("Failed to insert Alice's wallet");
-
-    sqlx::query!(
-        "INSERT INTO wallets (address, balance, currency) VALUES ($1, $2, $3)
-         ON CONFLICT (address) DO UPDATE SET balance = $2, currency = $3",
-        bob_addr.as_str(),
-        50i64,
+        alice_addr.as_str(),
+        100i64,
         "XRP"
     )
     .execute(&pool)
     .await
-    .expect("Failed to insert Bob's wallet");
+    .unwrap();
 
-    // Execute the transfer
+    // 2. Execute
     let result = service.execute_transfer(&alice_addr, &bob_addr, 30).await;
-
     assert!(result.is_ok());
 
-    // Verify Alice has 70 and Bob has 80 in the DB now
-    let alice_after = repo.find_by_address(&alice_addr).await.unwrap().unwrap();
+    // 3. Verify - WE NEED A TX TO USE THE REPO
+    // We call the provider (pool) to get a fresh verification transaction
+    let mut verify_tx = pool.begin_transaction().await.unwrap();
+
+    let alice_after = repo
+        .find_by_address(&mut verify_tx, &alice_addr)
+        .await
+        .unwrap()
+        .unwrap();
     assert_eq!(alice_after.balance(), 70);
+
+    // We don't strictly need to commit verify_tx because we didn't change data,
+    // but it's good practice to close the "baton" properly.
+    verify_tx.commit().await.unwrap();
 }
 
 // NEED to test the failure case...prove that the atomoicity works
@@ -98,6 +90,16 @@ async fn test_execute_transfer_fails_insufficient_funds_rolls_back() {
     );
 
     // 4. ATOMIC PROOF: Alice's balance must STILL be 100
-    let alice_after = repo.find_by_address(&alice_addr).await.unwrap().unwrap();
+    let mut verify_tx = pool.begin_transaction().await.unwrap();
+
+    let alice_after = repo
+        .find_by_address(&mut verify_tx, &alice_addr)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(alice_after.balance(), 100);
+
+    verify_tx.commit().await.unwrap();
+
     assert_eq!(alice_after.balance(), 100);
 }

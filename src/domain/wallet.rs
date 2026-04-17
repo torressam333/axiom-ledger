@@ -8,6 +8,14 @@ pub enum Currency {
     XRP,
 }
 
+impl Currency {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::XRP => "XRP",
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Wallet {
     address: Address,
@@ -70,6 +78,23 @@ impl Wallet {
     // Getter for wallets fixed currency
     pub fn currency(&self) -> &Currency {
         &self.currency
+    }
+
+    /// A domain-level 'Atomic' check.
+    /// Verifies if a transfer between two wallets is valid before we even try to commit.
+    pub fn validate_transfer(
+        sender: &Wallet,
+        receiver: &Wallet,
+        amount: u128,
+    ) -> Result<(), String> {
+        if sender.currency() != receiver.currency() {
+            return Err("Currency mismatch".into());
+        }
+
+        if sender.balance() < amount {
+            return Err("Insufficient funds".into());
+        }
+        Ok(())
     }
 }
 
