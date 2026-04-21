@@ -17,10 +17,13 @@
 - [x] **SQLx Integration:** Setup `sqlx` with compile-time query verification.
 - [x] **The Repository Trait:** Define a `WalletRepository` trait to allow for easy mocking.
 - [x] **Atomic Transactions:** Implement a "Transfer" function using SQL transactions.
-- [ ] **Multi-Asset Safety:** Implement currency validation in the Domain and Service layers to prevent illegal cross-asset transfers.
+- [x] **Multi-Asset Safety:** Implement currency validation in the Domain and Service layers to prevent illegal cross-asset transfers.
+- [] **Idempotency Table:** Add a processed_requests table (key: idempotency_key, status: processed, result: jsonb).
+- [] **Transaction Guard:** Update execute_transfer to check this table inside the existing SQL transaction. If the key exists, return the cached result.
 
 ## Phase 3: The GraphQL Supergraph Layer
 *The Goal: A high-performance, contract-first API using `async-graphql`.*
+- [ ] **Request Headers:** Force the GraphQL mutations to accept an x-idempotency-key header (or mutation argument).
 - [ ] **Schema Definition:** Design Queries (`wallet`), Mutations (`deposit`, `withdraw`, `transfer`).
 - [ ] **Custom Scalars:** Create a `Balance` scalar in GraphQL to match your Rust type.
 - [ ] **Dataloaders:** Implement batching for wallet lookups to solve the N+1 problem.
