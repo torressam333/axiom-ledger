@@ -73,7 +73,7 @@ where
         }
 
         // 2. Start the Transaction
-        let mut tx = self.provider.begin_transaction().await?;
+        let mut tx: <P as TransactionProvider>::Tx = self.provider.begin_transaction().await?;
 
         // 3. Orchestrate Resource Acquisition (Using our helper!)
         let (mut sender, mut receiver) = self

@@ -16,7 +16,14 @@ sqlx = { version = "0.8", features = [
   "chrono",
   "runtime-tokio-rustls",
   "bigdecimal",
+  "uuid",
+  "json",
 ] }
+
+serde = { version = "1.0.228", features = [
+  "derive",
+] }
+
 # For handling the NUMERIC database type accurately
 bigdecimal = "0.4"
 # Async runtime
@@ -27,3 +34,10 @@ dotenvy = "0.15"
 async-trait = "0.1"
 anyhow = "1.0.102"
 # Environment variable loader
+
+[dependencies.uuid]
+version = "1.23.1"
+# Lets you generate random UUIDs
+features = [
+  "v4",
+]
