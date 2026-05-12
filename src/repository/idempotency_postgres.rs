@@ -41,6 +41,7 @@ impl IdempotencyRepository for PostgresIdempotencyRepository {
 
     async fn save_result(
         &self,
+        executor: &mut sqlx::PgConnection, // Use same tx passed from service layer
         uuid: Uuid,
         response: &TransferResponse,
     ) -> Result<(), LedgerError> {
@@ -56,7 +57,7 @@ impl IdempotencyRepository for PostgresIdempotencyRepository {
             uuid,
             Json(response) as _
         )
-        .execute(&self.pool)
+        .execute(executor)
         .await
         .map_err(|e| LedgerError::DatabaseError(e.to_string()))?;
 
