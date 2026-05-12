@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT address, balance, currency FROM wallets WHERE address = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "address",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "balance",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "currency",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "eb0487b40c76dd6694e61ebfbe5f5a09a325495badb8e69505980f4019f0cabe"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO wallets (address, balance, currency) VALUES ($1, $2, $3) \n             ON CONFLICT (address) DO UPDATE SET balance = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "731070f15c23e78d416debe6bdfe1dafe34d4a5bdd0f2862520a06a7b33aa1b4"
+}
