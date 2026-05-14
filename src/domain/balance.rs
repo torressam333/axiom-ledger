@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::ops::Add;
 
@@ -37,11 +38,13 @@ impl Add for Balance {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct Drops(pub u128);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Balance(Drops);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Balance(pub Drops);
 
 impl Balance {
     // Setter
