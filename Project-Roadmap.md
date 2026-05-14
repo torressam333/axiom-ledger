@@ -19,7 +19,7 @@
 - [x] **Atomic Transactions:** Implement a "Transfer" function using SQL transactions.
 - [x] **Multi-Asset Safety:** Implement currency validation in the Domain and Service layers to prevent illegal cross-asset transfers.
 - [x] **Idempotency Table:** Add a processed_requests table (key: idempotency_key, status: processed, result: jsonb).
-- [] **Transaction Idempotency Guard:** Update execute_transfer to check this table inside the existing SQL transaction. If the key exists, return the cached result.
+- [x] **Transaction Idempotency Guard:** Update execute_transfer to check this table inside the existing SQL transaction. If the key exists, return the cached result.
 
 ## Phase 3: The GraphQL Supergraph Layer
 *The Goal: A high-performance, contract-first API using `async-graphql`.*

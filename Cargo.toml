@@ -33,7 +33,16 @@ tokio = { version = "1", features = [
 dotenvy = "0.15"
 async-trait = "0.1"
 anyhow = "1.0.102"
-# Environment variable loader
+
+# The core GraphQL engine
+async-graphql = { version = "7.0", features = [
+  "chrono",
+  "uuid",
+  "decimal",
+] }
+
+# The integration layer for your Axum web server
+async-graphql-axum = "7.0"
 
 [dependencies.uuid]
 version = "1.23.1"
